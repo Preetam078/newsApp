@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import NewsItem from './NewsItem'
 import Spinner from './Spinner';
 import PropTypes from 'prop-types'
+import InfiniteScroll from "react-infinite-scroll-component";
 
 
 
@@ -25,24 +26,23 @@ export default class NewsComponent extends Component {
         this.state = {
             articles:[],
             page:1,
-            loading:false,
-
+            loading:true,
+            totalResults:0
         }
     }
 
     async updateNews(){
-          
+        this.props.setProgress(30)
         let url = `https://newsapi.org/v2/top-headlines?country=in&category=${this.props.category}&apiKey=e18b6f36558845b0b4baa5fd1922773f&page=${this.state.page}&pageSize=${this.props.pageSize}`;
-        this.setState({
-            loading:true
-        })
         let data = await fetch(url);
+        this.props.setProgress(70)
         let parsedData = await data.json();
         console.log(parsedData)
         this.setState({articles:parsedData.articles,
           totalResults: parsedData.totalResults,
-          loading:false,
+          loading:false
         })
+        this.props.setProgress(100);
     }
 
      componentDidMount(){
@@ -50,63 +50,56 @@ export default class NewsComponent extends Component {
         this.updateNews();
         
     } 
-    
-    handleNextClick = async() =>{
-        console.log("next");
-
-        if (this.state.page+1 > Math.ceil(this.state.totalResults/this.props.pageSize)){
-    
-        }
-        else{
-            this.setState({
-                page: this.state.page+1,
-            })
-           this.updateNews();
-          
-        }
-       
-    }
-    handlePrevClick = async () => {
-        console.log("prev")
-
+    fetchMoreData = async() => {
         this.setState({
-            page: this.state.page+1,
+            page:this.state.page + 1
         })
-       this.updateNews();
-        
-    }
+
+        let url = `https://newsapi.org/v2/top-headlines?country=in&category=${this.props.category}&apiKey=e18b6f36558845b0b4baa5fd1922773f&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+       
+        let data = await fetch(url);
+        let parsedData = await data.json();
+        console.log(parsedData)
+        this.setState({articles:this.state.articles.concat(parsedData.articles),
+         
+        })
+         
+      };
 
     render() {
         const str = this.props.category;
         return (
-            <div className="container my-5">
+            <div className=" my-5">
                 <h1 className="text-center">
                     {str.toUpperCase()} - Top Headline
                 </h1>
-                <div className="my-3"> 
-                {this.state.loading && <Spinner/>}
-
-                </div>
                 
-            
+                {this.state.loading && <Spinner/>}
+                
+                <InfiniteScroll
+                    dataLength={this.state.articles.length}
+                    next={this.fetchMoreData}
+                    hasMore={this.state.articles.length !== this.state.totalResults}
+                    loader={<Spinner/>}
+                  >
+                 <div className="container">
+
                <div className="row">
-                   {!this.state.loading && this.state.articles.map((Element) => {
+                   {this.state.articles.map((Element) => {
                        return (
-                        <div className="col-md-4 my-3" key="{Element.publishedAt}" >
+                           <div className="col-md-4 my-3" key={Element.publishedAt}>
                          <NewsItem  title = {Element.title} description = {Element.description} imageUrl = {!Element.urlToImage?"https://image.shutterstock.com/image-vector/breaking-news-background-world-global-260nw-719766118.jpg":Element.urlToImage}
                          newsUrl={Element.url}
-                        time = {Element.publishedAt}
-                        source = {Element.source.name}
-                        author = {!Element.author?"Unknown":Element.author}
-                       />
+                         time = {Element.publishedAt}
+                         source = {Element.source.name}
+                         author = {!Element.author?"Unknown":Element.author}
+                         />
                     </div>
                        )
-                   })}
-                </div>  
-                <div className="d-flex justify-content-between my-3">
-                    <button disabled = {this.state.page <= 1} type="button"className="btn btn-primary" onClick={this.handlePrevClick}>Previous</button>
-                    <button disabled={this.state.page+1 > Math.ceil(this.state.totalResults/this.props.pageSize)} type="button"className="btn btn-primary" onClick={this.handleNextClick}>Next</button>
+                    })}
                 </div>
+                    </div>
+                </InfiniteScroll>  
     
             </div>
     

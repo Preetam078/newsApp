@@ -9,7 +9,7 @@ export default class NewsItem extends Component {
         return (
             <div>
                 <div className="card-deck style">
-                    <div className="card">
+                    <div className="card shade">
                         <img className="card-img-top" src={imageUrl} alt=""/>
                         
                         <div className="card-body">
