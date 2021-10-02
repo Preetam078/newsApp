@@ -41,3 +41,9 @@
   box-shadow: 3px 3px 25px grey;
 }
 
+.zoom{
+  transition: transform .2s;
+}
+.zoom:hover{
+  transform: scale(1.3);
+}

@@ -33,7 +33,7 @@ export default class NewsComponent extends Component {
 
     async updateNews(){
         this.props.setProgress(30)
-        let url = `https://newsapi.org/v2/top-headlines?country=in&category=${this.props.category}&apiKey=e18b6f36558845b0b4baa5fd1922773f&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+        let url = `https://newsapi.org/v2/top-headlines?country=in&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
         let data = await fetch(url);
         this.props.setProgress(70)
         let parsedData = await data.json();
@@ -55,7 +55,7 @@ export default class NewsComponent extends Component {
             page:this.state.page + 1
         })
 
-        let url = `https://newsapi.org/v2/top-headlines?country=in&category=${this.props.category}&apiKey=e18b6f36558845b0b4baa5fd1922773f&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+        let url = `https://newsapi.org/v2/top-headlines?country=in&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
        
         let data = await fetch(url);
         let parsedData = await data.json();
@@ -87,7 +87,7 @@ export default class NewsComponent extends Component {
                <div className="row">
                    {this.state.articles.map((Element) => {
                        return (
-                           <div className="col-md-4 my-3" key={Element.publishedAt}>
+                           <div className="col-md-4 my-3" key={Element.url}>
                          <NewsItem  title = {Element.title} description = {Element.description} imageUrl = {!Element.urlToImage?"https://image.shutterstock.com/image-vector/breaking-news-background-world-global-260nw-719766118.jpg":Element.urlToImage}
                          newsUrl={Element.url}
                          time = {Element.publishedAt}
